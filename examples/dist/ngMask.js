@@ -138,8 +138,10 @@
 
                     // Update view and model values
                     if(value !== viewValueWithDivisors){
-                      controller.$setViewValue(angular.copy(viewValueWithDivisors), 'input');
+                      controller.$viewValue = angular.copy(viewValueWithDivisors);
                       controller.$render();
+                      // Not using $setViewValue so we don't clobber the model value and dirty the form
+                      // without any kind of user interaction.
                     }
                   } catch (e) {
                     $log.error('[mask - parseViewValue]');
@@ -167,11 +169,9 @@
                 });
 
                 // Register the watch to observe remote loading or promised data
-                // Deregister calling returned function
-                var watcher = $scope.$watch($attrs.ngModel, function (newValue, oldValue) {
+                $scope.$watch($attrs.ngModel, function (newValue, oldValue) {
                   if (angular.isDefined(newValue)) {
                     parseViewValue(newValue);
-                    watcher();
                   }
                 });
 
@@ -180,8 +180,10 @@
                 // but before the browser renders
                 if(options.value) {
                   $scope.$evalAsync(function($scope) {
-                    controller.$setViewValue(angular.copy(options.value), 'input');
+                    controller.$viewValue = angular.copy(options.value);
                     controller.$render();
+                    // Not using $setViewValue so we don't clobber the model value and dirty the form
+                    // without any kind of user interaction.
                   });
                 }
               });
@@ -207,15 +209,15 @@
         var divisorElements = {};
         var regex = [];
         var patterns = {
-          '9': /[0-9]/,
-          '8': /[0-8]/,
-          '7': /[0-7]/,
-          '6': /[0-6]/,
-          '5': /[0-5]/,
-          '4': /[0-4]/,
-          '3': /[0-3]/,
-          '2': /[0-2]/,
-          '1': /[0-1]/,
+          '9': /[9]/,
+          '8': /[8]/,
+          '7': /[7]/,
+          '6': /[6]/,
+          '5': /[5]/,
+          '4': /[4]/,
+          '3': /[3]/,
+          '2': /[2]/,
+          '1': /[1]/,
           '0': /[0]/,
           '*': /./,
           'w': /\w/,
